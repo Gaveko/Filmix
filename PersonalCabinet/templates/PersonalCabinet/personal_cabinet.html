@@ -1,0 +1,119 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block dropdown_menu %}
+{% for genre in genres %}
+<li><a class="dropdown-item" href="{% url 'by_genre' url=genre.url %}">{{ genre.title }}</a></li>
+{% endfor %}
+{% endblock dropdown_menu %}
+
+{% block content %}
+<div class="container">
+  <h2>Кабинет {{ requiredUser.username }}</h2>
+  {% if isCabinetOwner %}
+    <form action="{% url 'cabinet' user.id %}" method="post">
+      {% csrf_token %}
+      {{ userPrivacyForm.as_p }}
+      <input type="submit" value="Изменить">
+    </form>
+  {% endif %}
+  {% if userPrivacy and not isCabinetOwner %}
+    <h2>К сожалению данный пользователь скрыл свой список</h2>
+  {% else %}
+  <table class="table">
+    <thead>
+      <th scope="col">№</th>
+      <th scope="col">Запланировано</th>
+      {% if isCabinetOwner %}
+      <th scope="col">Переместить в список</th>
+      <th scope="col"></th>
+      {% endif %}
+    </thead>
+    <tbody>
+      {% for film in status_p_films %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ film.filmId.title }}</td>
+        {% if isCabinetOwner %}
+        <td>
+          <form class="" action="{% url 'setFilmStatus' filmId=film.filmId.id %}" method="post">
+            {% csrf_token %}
+            <select class="" name="selectFilmStatus">
+              <option value="l">Просмотрено</option>
+              <option value="p">Запланировано</option>
+              <option value="t">Брошено</option>
+            </select>
+            <input type="submit" name="" value="Выбрать">
+          </form>
+        </td>
+        <td><a href="{% url 'delete' film.filmId.id %}">Удалить</a></td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <table class="table">
+    <thead>
+      <th scope="col">№</th>
+      <th scope="col">Просмотрено</th>
+      {% if isCabinetOwner %}
+      <th scope="col">Переместить в список</th>
+      {% endif %}
+    </thead>
+    <tbody>
+      {% for film in status_l_films %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ film.filmId.title }}</td>
+        {% if isCabinetOwner %}
+        <td>
+          <form class="" action="{% url 'setFilmStatus' filmId=film.filmId.id %}" method="post">
+            {% csrf_token %}
+            <select class="" name="selectFilmStatus">
+              <option value="l">Просмотрено</option>
+              <option value="p">Запланировано</option>
+              <option value="t">Брошено</option>
+            </select>
+            <input type="submit" name="" value="Выбрать">
+          </form>
+        </td>
+        <td><a href="{% url 'delete' film.filmId.id %}">Удалить</a></td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <table class="table">
+    <thead>
+      <th scope="col">№</th>
+      <th scope="col">Брошено</th>
+      {% if isCabinetOwner %}
+      <th scope="col">Переместить в список</th>
+      {% endif %}
+    </thead>
+    <tbody>
+      {% for film in status_t_films %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ film.filmId.title }}</td>
+        {% if isCabinetOwner %}
+        <td>
+          <form class="" action="{% url 'setFilmStatus' filmId=film.filmId.id %}" method="post">
+            {% csrf_token %}
+            <select class="" name="selectFilmStatus">
+              <option value="l">Просмотрено</option>
+              <option value="p">Запланировано</option>
+              <option value="t">Брошено</option>
+            </select>
+            <input type="submit" name="" value="Выбрать">
+          </form>
+        </td>
+        <td><a href="{% url 'delete' film.filmId.id %}">Удалить</a></td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endblock %}

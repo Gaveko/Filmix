@@ -1,0 +1,94 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block dropdown_menu %}
+{% for genre in genres %}
+<li><a class="dropdown-item" href="{% url 'by_genre' url=genre.url %}">{{ genre.title }}</a></li>
+{% endfor %}
+{% endblock dropdown_menu %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static '/Cinema/css/style.css' %}">
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <img src="/media/{{ film.image }}" class="film-detail-image" style="">
+    </div>
+    <div class="col">
+      <h2>{{ film.title }}</h2>
+      <div class="">
+        {% for genre in film.genres.all %}
+        <a href="#">{{ genre.title }}</a>
+        {% endfor %}
+      </div>
+      <div>
+        {% for goldenStar in goldenStars %}
+        <a href="{% url 'set_rating' value=goldenStar.value %}"><img style="width: 20px; height: 20px;" src="{% static 'Cinema/images/golden_star.png' %}" alt=""></a>
+        {% endfor %}
+        {% for emptyStar in emptyStars %}
+        <a href="{% url 'set_rating' value=emptyStar.value %}"><img style="width: 20px; height: 20px;" src="{% static 'Cinema/images/empty_star.png' %}" alt=""></a>
+        {% endfor %}
+      </div>
+      <div class="">
+        <p>Рейтинг: {{ film.rating }}</p>
+      </div>
+
+      <form class="" action="{% url 'setFilmStatus' filmId=film.id %}" method="post">
+        {% csrf_token %}
+        <select class="" name="selectFilmStatus">
+          <option value="l">Просмотрено</option>
+          <option value="p">Запланировано</option>
+          <option value="t">Брошено</option>
+        </select>
+        <input type="submit" name="" value="Выбрать">
+      </form>
+
+      <div class="">
+        {{ film.description }}
+      </div>
+    </div>
+  </div>
+
+  <h2>Вам могут понравиться</h2>
+  <div class="row row-cols-md-4 g-4">
+    {% for obj in filmCollection %}
+    <div class="col">
+      <div class="card h-100" style="width: 18rem;">
+        <img src="/media/{{ obj.image }}" class="card-img-top h-100">
+        <div class="card-body">
+          <h5 class="card-title text-center">{{ obj.title }}</h5>
+        </div>
+        <a href="{% url 'detail' url=obj.url %}" class="stretched-link"></a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <h2>Оставьте свой отзыв</h2>
+  <form action="{% url 'give_review' url=film.url %}" method="post">
+    {% csrf_token %}
+    {{ reviewForm.as_p }}
+    <input type="submit" value="Отправить">
+  </form>
+
+
+  <h2>Отзывы</h2>
+  {% if reviewsAreExists %}
+    {% for review in reviews %}
+      <div class="row">
+        <div class="col">
+          <a href="{% url 'cabinet' userId=review.user.id %}">{{ review.user }}</a>
+        </div>
+        <div class="col">
+          {{ review.description }}
+        </div>
+        <div class="col">
+          {{ review.date }}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>Отзывов на этот фильм пока что нет. Будьте первым.</p>
+  {% endif %}
+</div>
+{% endblock %}

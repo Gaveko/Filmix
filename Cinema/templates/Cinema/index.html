@@ -1,0 +1,72 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block dropdown_menu %}
+{% for genre in genres %}
+<li><a class="dropdown-item" href="{% url 'by_genre' url=genre.url %}">{{ genre.title }}</a></li>
+{% endfor %}
+{% endblock dropdown_menu %}
+
+{% block content %}
+<style media="screen">
+  #carouselExampleControls {
+    width: 70%;
+  }
+  body {
+    background-color: #000000;
+  }
+  .image {
+    padding-left: 7rem;
+    width: 20rem;
+    height: 30rem;
+  }
+  .text {
+    font-size: 13px;
+    padding-left: 15rem;
+    width: 40rem;
+  }
+</style>
+<h2 class="text-white">Рекомендуем к просмотру</h2>
+  <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      {% for bestFilm in bestFilms %}
+      {% if forloop.counter == 1 %}
+      <div class="carousel-item active">
+        <img src="/media/{{ bestFilm.image }}" class="image" alt="">
+        <div class="carousel-caption">
+          <p class="text-white text">{{ bestFilm.description }}</p>
+        </div>
+      </div>
+      {% else %}
+      <div class="carousel-item">
+        <img src="/media/{{ bestFilm.image }}" class="image" alt="">
+        <div class="carousel-caption">
+          <p class="text-white text">{{ bestFilm.description }}</p>
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+  <div class="row row-cols-md-4 g-4">
+    {% for film in films %}
+    <div class="col">
+      <div class="card h-100" style="width: 18rem;">
+        <img src="/media/{{ film.image }}" class="card-img-top h-100">
+        <div class="card-body">
+          <h5 class="card-title text-center">{{ film.title }}</h5>
+        </div>
+        <a href="{% url 'detail' url=film.url %}" class="stretched-link"></a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% endblock %}
