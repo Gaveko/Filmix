@@ -4,6 +4,8 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from .models import Film, Genre, Review, RatingStar, RatingFilm
 from .forms import ReviewForm
+from django.db.models import Avg
+
 
 # Create your views here.
 def set_rating(request, value):
@@ -30,7 +32,8 @@ def set_rating(request, value):
 
 
 def updateRatingValue(request, film):
-    film.rating = sum([x.stars.value for x in list(RatingFilm.objects.filter(filmId=film))]) / len(RatingFilm.objects.filter(filmId=film))
+    aggr_value = RatingFilm.objects.filter(filmId=film).aggregate(Avg('stars__value'))
+    film.rating = aggr_value['stars__value__avg']
     film.save()
 
 
@@ -76,13 +79,13 @@ class CinemaDetailView(DetailView):
             context['reviewsAreExists'] = True
 
         try:
-            goldenStars = RatingFilm.objects.get(filmId=Film.objects.get(url=self.kwargs['url']), userId=self.request.user).stars.value
+            goldenStars = RatingFilm.objects.get(filmId__url=self.kwargs['url'], userId=self.request.user).stars.value
         except:
             goldenStars = 0
 
 
         try:
-            if RatingFilm.objects.filter(filmId=Film.objects.get(url=self.kwargs['url']), userId=self.request.user).exists():
+            if RatingFilm.objects.filter(filmId__url=self.kwargs['url'], userId=self.request.user).exists():
                 context['goldenStars'] = RatingStar.objects.all()[0:goldenStars]
                 context['emptyStars'] = RatingStar.objects.all()[goldenStars:5]
             else:
